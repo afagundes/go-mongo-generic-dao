@@ -1,7 +1,7 @@
 package config
 
 const (
-	MongoUrlConnection = "mongodb+srv://admin:mongoadmin@cluster0.dcsel.mongodb.net/?retryWrites=true&w=majority"
+	MongoUrlConnection = "<STRING DE CONEXÃO COM MONBO DB>"
 	Database           = "myFirstDatabase"
 	Collection         = "usuarios"
 )
