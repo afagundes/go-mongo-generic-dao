@@ -2,15 +2,17 @@ package dao
 
 import (
 	"context"
+	"github.com/afagundes/mongo-generic-dao/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"time"
 )
 
 type DAO struct {
-	Database string
+	Database   string
 	Collection string
 }
 
@@ -19,10 +21,10 @@ var client *mongo.Client
 // Connect Conecta ao MongoDB
 func (u *DAO) Connect() {
 	var err error
-	client, err = mongo.NewClient(options.Client().ApplyURI("<CONNECTION_STRING>"))
+	client, err = mongo.NewClient(options.Client().ApplyURI(config.MongoUrlConnection))
 	checkErr(err)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	err = client.Connect(ctx)
@@ -41,7 +43,12 @@ func (u *DAO) GetAll(results interface{}) {
 	cur, err := collection.Find(context.Background(), bson.D{})
 	checkErr(err)
 
-	defer cur.Close(context.Background())
+	defer func(cur *mongo.Cursor, ctx context.Context) {
+		err := cur.Close(ctx)
+		if err != nil {
+			log.Println(err)
+		}
+	}(cur, context.Background())
 
 	if err := cur.All(context.Background(), results); err != nil {
 		panic(err)
@@ -60,14 +67,14 @@ func (u *DAO) GetById(id string, doc interface{}) {
 // Insert Insere um novo documento
 func (u *DAO) Insert(doc interface{}) interface{} {
 	collection := getCollection(u)
-	insertResult, err := collection.InsertOne(context.Background(), doc,options.InsertOne())
+	insertResult, err := collection.InsertOne(context.Background(), doc, options.InsertOne())
 	checkErr(err)
 
 	return insertResult.InsertedID
 }
 
 // Update Atualiza um documento
-func (u*DAO) Update(id string, doc interface{}) *mongo.UpdateResult {
+func (u *DAO) Update(id string, doc interface{}) *mongo.UpdateResult {
 	collection := getCollection(u)
 
 	objID, _ := primitive.ObjectIDFromHex(id)
@@ -100,9 +107,9 @@ func getCollection(u *DAO) *mongo.Collection {
 	return client.Database(u.Database).Collection(u.Collection)
 }
 
-// Função utilitária. Verifica se há erros e termina o programa caso haja
+// Função utilitária. Verifica se há erros e printa no console caso haja
 func checkErr(err error) {
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 }

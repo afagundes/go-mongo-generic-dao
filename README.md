@@ -51,7 +51,56 @@ id = objectID.(primitive.ObjectID).Hex()
 fmt.Printf("Inseriu novo usuário %s\n", id)
 ```
 
-Outros exemplos se encontram no arquivo `main.go`
+## Configuração
 
-## TODO
-Remover a string de conexão com o MongoBD do arquivo `dao.go`
+Para configurar o acesso ao MongoDB é necessário alterar o arquivo `config\constants.go` e adicionar a string de conexão.
+
+## API para testes
+
+Incluí uma API que disponibiliza um CRUD de usuários na porta 8080. Dessa forma é possível ver os métodos do DAO em ação.
+
+Os seguintes endpoints foram adicionados:
+
+<table>
+<tr>
+<th>Endpoint</th>
+<th>Método</th>
+<th>Descrição</th>
+</tr>
+<tr>
+<td>/usuario</td>
+<td>POST</td>
+<td>Adiciona um usuário</td>
+</tr>
+<tr>
+<td>/usuarios</td>
+<td>GET</td>
+<td>Retorna a lista de usuários cadastrados</td>
+</tr>
+<tr>
+<td>/usuario/{id}</td>
+<td>GET</td>
+<td>Retorna um usuário pelo seu ID</td>
+</tr>
+<tr>
+<td>/usuario/{id}</td>
+<td>PUT</td>
+<td>Atualiza um usuário (exemplo de JSON abaixo)</td>
+</tr>
+<tr>
+<td>/usuario/{id}</td>
+<td>DELETE</td>
+<td>Remove um usuário pelo seu ID</td>
+</tr>
+</table>
+
+O JSON utilizado nos endpoints POST e PUT é o seguinte:
+
+```json
+{
+  "nome": "Maria",
+  "idade": 30,
+  "bio": "Testando a API com Mongo Generic DAO",
+  "foto": "https://image.flaticon.com/icons/png/512/25/25231.png"
+}
+```
