@@ -90,21 +90,29 @@ func DeleteUser(_ http.ResponseWriter, r *http.Request) {
 }
 
 func getBody(w http.ResponseWriter, r *http.Request) (model.Usuario, bool) {
+	finalizaExecucao := false
+
 	body, err := ioutil.ReadAll(r.Body)
+
 	if err != nil {
+		finalizaExecucao = true
+
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		return model.Usuario{}, true
+		return model.Usuario{}, finalizaExecucao
 	}
 
 	var usuario model.Usuario
 	err = json.Unmarshal(body, &usuario)
+
 	if err != nil {
+		finalizaExecucao = true
+
 		w.WriteHeader(http.StatusBadRequest)
-		return model.Usuario{}, true
+		return model.Usuario{}, finalizaExecucao
 	}
 
-	return usuario, false
+	return usuario, finalizaExecucao
 }
 
 func writeResponse(w http.ResponseWriter, usuario interface{}, status int) {
